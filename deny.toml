@@ -14,6 +14,8 @@ ignore = [
     "RUSTSEC-2024-0421",
     # time's fix needs serde versions excluded by soroban-env-common's exact pin.
     "RUSTSEC-2026-0009",
+    # rand unsoundness pulled in via soroban-env-host.
+    "RUSTSEC-2026-0097",
 ]
 
 [licenses]

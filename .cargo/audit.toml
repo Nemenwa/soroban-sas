@@ -18,4 +18,6 @@ ignore = [
     # 0.3.47 needs a serde_core/serde_derive newer than the
     # `serde = "=1.0.192"` soroban-env-common pins exactly.
     "RUSTSEC-2026-0009",
+    # rand unsoundness pulled in via soroban-env-host.
+    "RUSTSEC-2026-0097",
 ]
