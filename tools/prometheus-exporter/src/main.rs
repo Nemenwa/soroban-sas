@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 use anyhow::Result;
 use hyper::service::{make_service_fn, service_fn};
@@ -20,15 +21,15 @@ impl Config {
     fn from_env() -> Result<Self> {
         let sas_contract_id = env::var("SAS_CONTRACT_ID")
             .map_err(|_| anyhow::anyhow!("SAS_CONTRACT_ID environment variable is required"))?;
-        
+
         let schema_registry_contract_id = env::var("SCHEMA_REGISTRY_CONTRACT_ID").ok();
         let indexer_contract_id = env::var("INDEXER_CONTRACT_ID").ok();
-        
+
         let metrics_addr: SocketAddr = env::var("METRICS_ADDR")
             .unwrap_or_else(|_| "0.0.0.0:9090".to_string())
             .parse()
             .map_err(|e| anyhow::anyhow!("Invalid METRICS_ADDR: {}", e))?;
-        
+
         Ok(Self {
             sas_contract_id,
             schema_registry_contract_id,
@@ -105,10 +106,7 @@ impl SasMetrics {
         )?;
         registry.register(Box::new(active_attestations.clone()))?;
 
-        let active_schemas = Gauge::new(
-            "sas_active_schemas",
-            "Current number of active schemas",
-        )?;
+        let active_schemas = Gauge::new("sas_active_schemas", "Current number of active schemas")?;
         registry.register(Box::new(active_schemas.clone()))?;
 
         let event_processing_duration = Histogram::with_opts(
@@ -116,7 +114,9 @@ impl SasMetrics {
                 "sas_event_processing_duration_seconds",
                 "Duration of event processing in seconds",
             )
-            .buckets(vec![0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0]),
+            .buckets(vec![
+                0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0,
+            ]),
         )?;
         registry.register(Box::new(event_processing_duration.clone()))?;
 
@@ -184,9 +184,7 @@ async fn metrics_handler(state: ExporterState) -> hyper::Result<Response<Body>> 
     let encoder = TextEncoder::new();
     let metric_families = state.metrics.registry.gather();
     let mut buffer = Vec::new();
-    encoder
-        .encode(&metric_families, &mut buffer)
-        .unwrap();
+    encoder.encode(&metric_families, &mut buffer).unwrap();
 
     Ok(Response::builder()
         .status(StatusCode::OK)
@@ -205,17 +203,15 @@ async fn main() -> Result<()> {
         .init();
 
     let config = Config::from_env()?;
-    
+
     info!("Starting SAS Prometheus metrics exporter");
     info!("SAS Contract ID: {}", config.sas_contract_id);
     info!("Metrics address: {}", config.metrics_addr);
-    
+
     let metrics = Arc::new(SasMetrics::new()?);
-    
-    let state = ExporterState {
-        metrics,
-    };
-    
+
+    let state = ExporterState { metrics };
+
     let state_clone = state.clone();
     let make_svc = make_service_fn(move |_conn| {
         let state = state_clone.clone();
@@ -226,12 +222,14 @@ async fn main() -> Result<()> {
             }))
         }
     });
-    
+
     let server = Server::bind(&config.metrics_addr).serve(make_svc);
-    
+
     info!("Metrics server listening on {}", config.metrics_addr);
-    
-    server.await.map_err(|e| anyhow::anyhow!("Server error: {}", e))?;
+
+    server
+        .await
+        .map_err(|e| anyhow::anyhow!("Server error: {}", e))?;
 
     Ok(())
 }
