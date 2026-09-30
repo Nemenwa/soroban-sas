@@ -1,6 +1,6 @@
 use super::*;
 use soroban_sas_sdk::events::{AttestationIssued, AttestationRevoked, BatchAttested, BatchRevoked, SasEvent, SchemaRegistered};
-use soroban_sdk::xdr::ScAddress;
+use soroban_sdk::xdr::{Hash, ScAddress};
 
 #[test]
 fn test_metrics_creation() {
@@ -15,13 +15,13 @@ fn test_record_attestation_issued() {
     let event = SasEvent::AttestationIssued(AttestationIssued {
         uid: [0u8; 32],
         schema_uid: [1u8; 32],
-        attester: ScAddress::Contract([2u8; 32]),
-        recipient: ScAddress::Contract([3u8; 32]),
+        attester: ScAddress::Contract(Hash([2u8; 32])),
+        recipient: ScAddress::Contract(Hash([3u8; 32])),
     });
     
     metrics.record_event(&event, "test_contract");
     
-    assert_eq!(metrics.attestation_issued_total.get(), 1);
+    assert_eq!(metrics.attestation_issued_total.get(), 1.0);
     assert_eq!(metrics.active_attestations.get(), 1.0);
 }
 
@@ -36,7 +36,7 @@ fn test_record_attestation_revoked() {
     
     metrics.record_event(&event, "test_contract");
     
-    assert_eq!(metrics.attestation_revoked_total.get(), 1);
+    assert_eq!(metrics.attestation_revoked_total.get(), 1.0);
     assert_eq!(metrics.active_attestations.get(), -1.0);
 }
 
@@ -51,7 +51,7 @@ fn test_record_batch_attested() {
     
     metrics.record_event(&event, "test_contract");
     
-    assert_eq!(metrics.batch_attested_total.get(), 1);
+    assert_eq!(metrics.batch_attested_total.get(), 1.0);
     assert_eq!(metrics.active_attestations.get(), 5.0);
 }
 
@@ -66,7 +66,7 @@ fn test_record_batch_revoked() {
     
     metrics.record_event(&event, "test_contract");
     
-    assert_eq!(metrics.batch_revoked_total.get(), 1);
+    assert_eq!(metrics.batch_revoked_total.get(), 1.0);
     assert_eq!(metrics.active_attestations.get(), -3.0);
 }
 
@@ -76,12 +76,12 @@ fn test_record_schema_registered() {
     
     let event = SasEvent::SchemaRegistered(SchemaRegistered {
         schema_uid: [0u8; 32],
-        owner: ScAddress::Contract([1u8; 32]),
+        owner: ScAddress::Contract(Hash([1u8; 32])),
     });
     
     metrics.record_event(&event, "test_contract");
     
-    assert_eq!(metrics.schema_registered_total.get(), 1);
+    assert_eq!(metrics.schema_registered_total.get(), 1.0);
     assert_eq!(metrics.active_schemas.get(), 1.0);
 }
 

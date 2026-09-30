@@ -729,6 +729,39 @@ original diagnostic in parentheses. Signing commands accept
 never falls back to `--secret-key`; the device path is `SAS_LEDGER_DEVICE`
 or `SAS_TREZOR_DEVICE`. `soroban-sas man` writes a groff man page for the
 current command tree (`--path` selects a file).
+## Monitoring and Metrics
+
+The Prometheus exporter (`tools/prometheus-exporter`) provides observability for SAS contract activity by exposing metrics that can be scraped by Prometheus or other monitoring systems.
+
+### Metrics Exposed
+
+The exporter tracks the following metrics:
+
+- **Counters**: Total counts for each event type (attestations issued/revoked, batch operations, schema registrations, fee updates)
+- **Gauges**: Current state (active attestations, active schemas)
+- **Histograms**: Event processing duration
+
+### Configuration
+
+The exporter is configured via environment variables:
+
+- `SAS_CONTRACT_ID`: The SAS contract address to monitor (required)
+- `SCHEMA_REGISTRY_CONTRACT_ID`: Optional schema registry contract address
+- `INDEXER_CONTRACT_ID`: Optional indexer contract address
+- `METRICS_ADDR`: Address to bind the metrics HTTP server (default: `0.0.0.0:9090`)
+
+### Usage
+
+```bash
+cargo build -p soroban-sas-prometheus-exporter
+export SAS_CONTRACT_ID="C..."
+./target/debug/soroban-sas-prometheus-exporter
+```
+
+Metrics are exposed at `http://localhost:9090/metrics` in Prometheus text format.
+
+---
+
 ## Mutation Testing
 
 The workspace has a mutation testing baseline measured with `cargo-mutants`.

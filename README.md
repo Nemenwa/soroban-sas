@@ -90,6 +90,10 @@ The workspace has evolved beyond initial mocks and now includes comprehensive do
   A prototype read-only web dashboard for browsing a Schema Registry and validating draft schemas.
   See the [Schema Explorer README](tools/schema-explorer/README.md).
 
+- `tools/prometheus-exporter`
+  A Prometheus metrics exporter that monitors SAS contract events and exposes metrics for observability.
+  See the [Prometheus Exporter README](tools/prometheus-exporter/README.md).
+
 - `.githooks/`
   Opt-in `pre-commit` and `pre-push` hooks that run CI's formatting and lint checks locally.
   Enable them with `./scripts/install_hooks.sh`.
