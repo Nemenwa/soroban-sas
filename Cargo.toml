@@ -7,6 +7,7 @@ members = [
     "packages/soroban-sas-sdk",
     "packages/soroban-sas-cli",
     "contracts/permissive-resolver",
+    "tools/prometheus-exporter",
 ]
 exclude = ["fuzz"]
 resolver = "2"
